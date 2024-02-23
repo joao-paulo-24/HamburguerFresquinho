@@ -1,0 +1,99 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<style>
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0; 
+        padding: 0; 
+        text-align: center; 
+    }
+
+    .content {
+        text-align: center;
+    }
+
+    h1.display-4 {
+        color: #8B4513;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    p {
+        color: #8B4513;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .centered-image {
+        max-width: 100%;
+        height: auto; 
+        margin-top: 20px; 
+        width: 35%;
+        align-content: center;
+    }
+</style>
+
+<body>
+    @if (ViewBag.UserCookieExists == null)
+    {
+        <a class="btn btn-light text-dark" asp-area="" asp-controller="AuthMVC" asp-action="Login" style="position: fixed; top: 5px; right: 7px; z-index: 999; background-color: transparent; border-color: transparent; width: 60px; height: 60px; border: none; padding: 0;">
+            <img src="/Images/login_icon.png" style="width: 60px; height: 60px; border: none;" />
+        </a>
+    }
+    else
+    {
+        <a class="btn btn-light text-dark" asp-area="" asp-controller="AuthMVC" asp-action="Logout" style="position: fixed; top: 5px; right: 7px; z-index: 999; background-color: transparent; border-color: transparent; width: 60px; height: 60px; border: none; padding: 0;">
+            <img src="/Images/logout_icon.png" style="width: 60px; height: 60px; border: none;" />
+        </a>
+        <a class="btn btn-light text-dark" asp-area="" asp-controller="AuthMVC" asp-action="Edit" style="position: fixed; top: 80px; right: 7px; z-index: 999; background-color: transparent; border-color: transparent; width: 60px; height: 60px; border: none; padding: 0;">
+            <img src="/Images/EditProfile.png" style="width: 60px; height: 60px; border: none;" />
+        </a>
+        <a class="btn btn-light text-dark" asp-area="" asp-controller="TicketMVC" asp-action="Index" style="position: fixed; top: 160px; right: 7px; z-index: 999; background-color: transparent; border-color: transparent; width: 60px; height: 60px; border: none; padding: 0;">
+            <img src="/Images/supportIcon.png" style="width: 60px; height: 60px; border: none;" />
+        </a>
+    }
+    
+
+    <div class="content">
+        <h1 class="display-4">Bem-vindo à Hamburguer Fresquinho!</h1>
+        <p>Sinta-se bem-vindo ao lugar onde cuidamos para que o seu prazer em cada hambúrguer seja excepcional.</p>
+        <img src="/Images/imageHome.png" alt="Descrição da imagem" class="centered-image">
+    </div>
+
+
+</body>
+
+<script>
+    // Função para verificar se um cookie existe e obter seu valor
+    function getCookieValue(cookieName) {
+        // Separa os cookies em um array
+        var cookies = document.cookie.split(';');
+
+        // Procura o cookie desejado
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i];
+            while (cookie.charAt(0) === ' ') {
+                cookie = cookie.substring(1);
+            }
+            if (cookie.indexOf(cookieName + '=') === 0) {
+                return cookie.substring(cookieName.length + 1, cookie.length);
+            }
+        }
+        return null; // Retorna null se o cookie não for encontrado
+    }
+
+    // Uso da função para obter o valor de um cookie específico
+    var valorDoCookie = getCookieValue('UserCookie');
+
+    // Exemplo de uso do valor do cookie
+    if (valorDoCookie !== null) {
+        console.log('Valor do cookie: ' + valorDoCookie);
+        // Faça algo com o valor do cookie aqui
+    } else {
+        console.log('O cookie não foi encontrado ou está vazio.');
+    }
+</script>

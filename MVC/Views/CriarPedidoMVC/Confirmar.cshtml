@@ -1,0 +1,59 @@
+﻿@{
+    ViewData["Title"] = "Pedido Confirmado";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Confirmação de Pedido</title>
+	<style>
+		.footer {
+			position: fixed;
+			bottom: 0;
+			width: 100%;
+			height: 60px; 
+			line-height: 60px;
+			/ Use o mesmo valor de altura para o line-height para centralizar verticalmente o texto / display: flex;
+			justify-content: center;
+			align-content: end;
+			padding-left: 550px;
+		}
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 50px;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        h1 {
+            color: #8B4513;
+            font-weight: bold;
+            font-size: 86px;
+        }
+
+        p {
+            font-size: 24px;
+            color: #333;
+            font-family: 'Arial', sans-serif; 
+        }
+
+
+	</style>
+</head>
+<body>
+    <div>
+        <i class="fas fa-check-circle confirmation-icon"></i>
+        <h1>Pedido Confirmado!</h1>
+        <p>O seu pedido foi recebido com sucesso. Agradecemos pela sua preferência.</p>
+        <a asp-controller="PedidoMVC" asp-action="Index" style="color:#8b4513">Ver os seus pedidos</a>
+    </div>
+</body>
+</html>

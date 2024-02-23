@@ -1,0 +1,68 @@
+﻿@using WebAPI.Enums
+@model Ticket
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0; 
+        padding: 0; 
+        text-align: center;
+    }
+
+    .footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        height: 60px; 
+        line-height: 60px;
+        display: flex;
+        justify-content: center;
+        align-content: end;
+    }
+
+    h1 {
+        color: #8B4513;
+        font-weight: bold;
+    }
+
+    form {
+        background-color: #fcece1;
+        border: none;
+    }
+</style>
+
+
+<h1>Edit Ingredient</h1>
+<body>
+    <form method="post" asp-controller="TicketMVC" asp-action="Edit">
+        <div class="border m-2 p-4">
+            <div class="row pb-2">
+                <h2 class="text-primary">Edit Ticket</h2>
+            </div>
+            <div asp-validation-summary="All"></div>
+            <div class="mb-3">
+                <label asp-for="Titulo" class="form-label"></label>
+                <input asp-for="Titulo" class="form-control" readonly />
+                <span asp-validation-for="Titulo" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Texto" class="form-label"></label>
+                <input asp-for="Texto" class="form-control" />
+                <span asp-validation-for="Texto" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary" style="border-color:transparent">Update</button>
+            <a asp-controller="TicketMVC" asp-action="Index" class="btn btn-secondary" style="color:#8b4513">Back</a>
+        </div>
+    </form>
+</body>
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

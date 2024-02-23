@@ -1,0 +1,61 @@
+﻿@model Item
+@{
+    ViewData["Title"] = "Delete";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0;
+        padding: 0; 
+        text-align: center; 
+    }
+    .footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        height: 60px;
+        line-height: 60px; 
+        display: flex;
+        justify-content: center;
+        align-content: end;
+    }
+
+    h2{
+        color: #8B4513;
+        font-weight: bold;
+    }
+
+    form {
+        background-color: #fcece1; /* Adiciona fundo branco ao conteúdo */
+        border: none;
+    }
+</style>
+
+
+<h1>Delete Item</h1>
+<body>
+    <form method="post" asp-action="DeleteConfirmed">
+    <input asp-for="Name" hidden />
+    <div class="border m-2 p-4">
+        <div asp-validation-summary="All"></div>
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger" role="alert">
+                    @TempData["ErrorMessage"]
+                </div>
+            }
+        <div class="mb-3">
+            <label asp-for="Name" class="form-label"></label>
+            <input asp-for="Name" class="form-control" disabled />
+        </div>
+            <input asp-for="Id" hidden />
+            <input asp-for="ImagePath" hidden />
+            <button type="submit" class="btn btn-primary" style="border-color:transparent">Delete</button>
+            <a asp-controller="ItemsMVC" asp-action="Index" class="btn btn-secondary" style="color:#8b4513">Back</a>
+    </div>
+</form>
+</body>

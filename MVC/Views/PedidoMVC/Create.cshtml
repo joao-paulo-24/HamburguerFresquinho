@@ -1,0 +1,194 @@
+﻿@using ProjetoLDS.Models
+@using WebAPI.Models
+@using WebAPI.Controllers
+@using MVC.Models
+@model Pedido
+@{
+	ViewData["Title"] = "Create";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+	body {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		margin: 0; /* Remove margens padrão para evitar deslocamentos */
+		padding: 0; /* Certifica-se de que o padding padrão também seja removido */
+		text-align: center; /* Alinha o texto no centro do corpo */
+	}
+
+	.footer {
+		position: fixed;
+		bottom: 0;
+		width: 100%;
+		height: 60px; /* Defina a altura desejada para o footer */
+		line-height: 60px; /* Use o mesmo valor de altura para o line-height para centralizar verticalmente o texto */
+		display: flex;
+		justify-content: center;
+		align-content: end;
+	}
+
+	h1 {
+		color: #8B4513;
+		font-weight: bold;
+	}
+
+	form {
+		background-color: #fcece1; /* Adiciona fundo branco ao conteúdo */
+		border: none;
+	}
+</style>
+
+<h1>Create</h1>
+<body>
+<form method="post">
+	<div class="border m-2 p-4">
+		<div class="row pb-2">
+			<h2 class="text-primary">Create Menu</h2>
+		</div>
+
+		<div asp-validation-summary="All"> </div>
+
+		<div>
+			<label asp-for="ContaUtilizador.Id">Id da Conta de Utilizador</label>
+			<input asp-for="ContaUtilizador.Id" class="form-control" />
+			<span asp-validation-for="ContaUtilizador.Id" class="text-danger"></span>
+		</div>
+
+
+		<div>
+			<label for="quantidadeItemsPedido">Número de ItemsPedido:</label>
+			<input type="number" id="quantidadeItemsPedido" class="form-control" />
+		</div>
+
+		<div id="itemsPedidoContainer"></div>
+			<button type="button" id="adicionarItemsPedido" class="btn btn-primary" style="border-color:transparent">Adicionar ItemsPedido</button>
+
+		<div>
+			<div id="dynamicItemsPedido">
+				<!-- Campos dinâmicos serão adicionados aqui -->
+			</div>
+		</div>
+
+			<button type="submit" class="btn btn-primary" style="border-color:transparent">Create</button>
+
+			<a asp-controller="PedidoMVC" asp-action="Index" class="btn btn-secondary" style="color:#8b4513">Back</a>
+	</div>
+</form>
+</body>
+
+@section Scripts {
+	@{
+		<partial name="_ValidationScriptsPartial" />
+	}
+
+	<script>
+		$(document).ready(function () {
+			$("#adicionarItemsPedido").click(function () {
+				var quantidadeItemsPedido = $("#quantidadeItemsPedido").val();
+
+				// Limpar campos dinâmicos existentes
+				$("#dynamicItemsPedido").empty();
+
+				// Adicionar campos dinâmicos com base na quantidade especificada
+				for (var i = 0; i < quantidadeItemsPedido; i++) {
+					var dynamicField = $("<div>")
+						.append($("<h4>").addClass("text-primary").text("Item"))
+						.append(
+							$("<label>").attr("for", `ItensPedido_${i}__ItemCompra_Name`).text(`Nome do Item ${i + 1}:`),
+							$("<input>")
+								.attr({
+									type: "text",
+									id: `ItensPedido_${i}__ItemCompra_Name`,
+									name: `ItensPedido[${i}].ItemCompra.Name`,
+									class: "form-control"
+								}),
+							$("<span>").attr("asp-validation-for", `ItensPedido[${i}].ItemCompra.Name`).addClass("text-danger")
+						)
+						.append(
+							$("<div>").append(
+								$("<label>").attr("for", `quantidadeItemsModificar_${i}`).text("Quantidade de Itens a Modificar:"),
+								$("<input>")
+									.attr({
+										type: "number",
+										id: `quantidadeItemsModificar_${i}`,
+										name: `QuantidadeItemsModificar[${i}]`,
+										class: "form-control"
+									})
+							)
+						)
+						.append($("<div>").attr("id", "itemsPedidoContainer"))
+						.append(
+							$("<button>")
+								.attr({ type: "button", class: "btn btn-primary adicionarItemsModificar" })
+								.text("Adicionar Modificações")
+						)
+						.append(
+							$("<div>").addClass("dynamicItemsModificar").append(
+								// Campos dinâmicos serão adicionados aqui
+							)
+						);
+
+					$("#dynamicItemsPedido").append(dynamicField);
+				}
+			});
+
+			// Evento para adicionar itens modificados
+			$("#dynamicItemsPedido").on("click", ".adicionarItemsModificar", function () {
+				var container = $(this).closest("div");
+				var index = container.index();
+				var quantidadeItemsPedido = $("#quantidadeItemsModificar_" + index).val();
+
+				// Limpar campos dinâmicos existentes apenas dentro do contêiner pai
+				container.find(".dynamicItemsModificar").empty();
+
+				// Adicionar campos dinâmicos com base na quantidade especificada
+				for (var i = 0; i < quantidadeItemsPedido; i++) {
+					var dynamicField = $("<div>")
+						.append(
+							$("<label>").attr("for", `ItensPedido_${index}__EditIngredientes_${i}__Item_Name`).text(`Item Modificar ${i + 1}:`),
+							$("<input>")
+								.attr({
+									type: "text",
+									id: `ItensPedido_${index}__EditIngredientes_${i}__Item_Name`,
+									name: `ItensPedido[${index}].EditIngredientes[${i}].Item.Name`,
+									class: "form-control"
+								}),
+							$("<span>").attr("asp-validation-for", `ItensPedido[${index}].EditIngredientes[${i}].Item.Name`).addClass("text-danger")
+						)
+						.append(
+							$("<label>").attr("for", `ItensPedido_${index}__EditIngredientes_${i}__Ingrediente_Name`).text(`Ingrediente a Modificar ${i + 1}:`),
+							$("<input>")
+								.attr({
+									type: "text",
+									id: `ItensPedido_${index}__EditIngredientes_${i}__Ingrediente_Name`,
+									name: `ItensPedido[${index}].EditIngredientes[${i}].Ingrediente.Name`,
+									class: "form-control"
+								}),
+							$("<span>").attr("asp-validation-for", `ItensPedido[${index}].EditIngredientes[${i}].Ingrediente.Name`).addClass("text-danger")
+						)
+						.append(
+							$("<label>").attr("for", `ItensPedido_${index}__EditIngredientes_${i}__Active`).text(`Activo ${i + 1}:`),
+							$("<input>")
+								.attr({
+									type: "checkbox",
+									id: `ItensPedido_${index}__EditIngredientes_${i}__Active`,
+									name: `ItensPedido[${index}].EditIngredientes[${i}].Active`,
+									class: "form-check-input"
+								})
+								// Adicione um evento change para converter o valor para booleano
+								.on("change", function () {
+									// Atualize o valor do atributo 'value' para ser 'true' ou 'false'
+									$(this).val(this.checked.toString());
+								}),
+							$("<span>").attr("asp-validation-for", `ItensPedido[${index}].EditIngredientes[${i}].Active`).addClass("text-danger")
+						);
+
+					container.find(".dynamicItemsModificar").append(dynamicField);
+				}
+			});
+		});
+	</script>
+
+
+}

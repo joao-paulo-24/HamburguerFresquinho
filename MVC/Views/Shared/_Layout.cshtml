@@ -1,0 +1,198 @@
+﻿<!DOCTYPE html>
+<style>
+    .footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        height: 60px; 
+        line-height: 60px; 
+        display: flex;
+        justify-content: center;
+        align-content: end;
+        align-items: center;
+        background-color: transparent;
+        margin: 0; 
+        padding: 0;
+        text-align: center;
+    }
+
+    .sidebar {
+        background-color: burlywood;
+        height: 100vh; 
+        width: 200px; 
+        position: fixed;
+        top: 0;
+        left: 0;
+        padding-top: 60px; 
+        display: flex; 
+        flex-direction: column; 
+        justify-content: center; 
+        align-items: center; 
+        transform: translateX(-200px); 
+        transition: transform 0.3s ease;
+    }
+
+    
+    .main-content {
+        margin-left: 200px; 
+        padding-top: 60px; 
+        background-color: burlywood;
+    }
+
+    
+    .btn {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        background-color: transparent;
+        color: black;
+        box-sizing: border-box;
+        position: relative;
+        text-decoration: none;
+    }
+
+        .btn::before,
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 5px; 
+            background-color: transparent;
+        }
+
+        
+        .btn::before {
+            left: 0;
+        }
+
+        .btn::after {
+            right: 0;
+        }
+
+    .sidebar img {
+        display: block;
+        width: 100px;
+        margin-bottom: 20px;
+    }
+
+    nav {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .sidebar img {
+        display: block;
+        width: 80px;
+        margin-bottom: 1px;
+        align-items: center;
+    }
+
+    .sidebar.active {
+        transform: translateX(0);
+    }
+</style>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - HF</title>
+    @*     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />*@
+    <link rel="stylesheet" href="~/css/mycss.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/MVC.styles.css" asp-append-version="true" />
+</head>
+<body style="background-image: url('/Images/background3.jpg'); background-size: cover; background-position: center;">
+    <button id="sidebarToggleOutside" onclick="toggleSidebar()" style="position: fixed; top: 10px; left: 10px; z-index: 999; background: url('/Images/barras.png') center center no-repeat; background-size: contain; width: 50px; height: 50px; border: none; text-indent: -9999px;" aria-label="Toggle Outside"></button>
+    <div class="sidebar">
+        <button id="sidebarToggleInside" onclick="toggleSidebar()" style="position: fixed; top: 5px; left: 7px; z-index: 999; background: url('/Images/cross.png') center center no-repeat; background-size: contain; width: 60px; height: 60px; border: none; text-indent: -9999px;" aria-label="Toggle Inside"></button>
+        <nav>
+
+            <a class="btn btn-light text-dark" asp-area="" asp-controller="Home" asp-action="Index">
+                <img src="/Images/Home_page.png" />
+                Home
+            </a>
+
+            <a class="btn btn-light text-dark" asp-area="" asp-controller="StockMVC" asp-action="Index">
+                <img src="/Images/ingredients.png" />
+                Ingredientes
+            </a>
+
+            <a class="btn btn-light text-dark" asp-area="" asp-controller="ItemsMVC" asp-action="Index">
+                <img src="/Images/items.png" />
+                Items
+            </a>
+
+            <a class="btn btn-light text-dark" asp-area="" asp-controller="MenuMVC" asp-action="Index">
+                <img src="/Images/menu.png" />
+                Menus
+            </a>
+
+            <a class="btn btn-light text-dark" asp-area="" asp-controller="CriarPedidoMVC" asp-action="Index">
+                <img src="/Images/carrinhoCompras.png" />
+                Criar Pedido
+            </a>
+
+            <a class="btn btn-light text-dark" asp-area="" asp-controller="PedidoMVC" asp-action="Index">
+                <img src="/Images/requests.png" />
+                Pedidos
+            </a>
+        </nav>
+    </div>
+
+
+    <div class="col-md-9">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    @if (!ViewContext.RouteData.Values["Controller"].ToString().Equals("Home") || !ViewContext.RouteData.Values["Action"].ToString().Equals("Privacy"))
+    {
+        <footer class="border-top footer text-muted">
+            <div class="container">
+                &copy; 2023 - HF - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            </div>
+        </footer>
+    }
+    <script>
+        var sidebar = document.querySelector('.sidebar');
+        var toggleOutside = document.getElementById('sidebarToggleOutside');
+        var toggleInside = document.getElementById('sidebarToggleInside');
+        var isOpen = false;
+
+        function toggleSidebar() {
+            if (!isOpen) {
+                sidebar.style.transform = "translateX(0)";
+                toggleInside.style.display = 'block';
+                toggleOutside.style.display = 'none';
+            } else {
+                sidebar.style.transform = "translateX(-200px)";
+                toggleInside.style.display = 'none';
+                toggleOutside.style.display = 'block';
+            }
+            isOpen = !isOpen;
+        }
+
+        // Fecha a barra lateral quando clicar fora dela
+        window.addEventListener('click', function (event) {
+            if (isOpen && event.target !== sidebar && event.target !== toggleInside && event.target !== toggleOutside) {
+                sidebar.style.transform = "translateX(-200px)";
+                toggleInside.style.display = 'none';
+                toggleOutside.style.display = 'block';
+                isOpen = false;
+            }
+        });
+    </script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    @*     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>*@
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

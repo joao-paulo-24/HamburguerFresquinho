@@ -1,0 +1,162 @@
+﻿@model List<Pedido>
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0;
+        padding: 0;
+        text-align: center;
+    }
+
+    .footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        height: 60px;
+        line-height: 60px;
+        display: flex;
+        justify-content: center;
+        align-content: end;
+    }
+
+    h1 {
+        color: #8B4513;
+        font-weight: bold;
+    }
+
+    .product-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 29px;
+        justify-content: center;
+    }
+
+    .product-card {
+        flex: 0 0 calc(33.33% - 20px);
+        box-sizing: border-box;
+        border: 1px solid #ddd;
+        padding: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+        .product-card h3 {
+            margin-top: 10px;
+            color: #333;
+        }
+
+        .product-card p {
+            color: #888;
+        }
+</style>
+
+<h1>Pedidos</h1>
+
+@if (ViewBag.UserCookieExists != "Cliente")
+{
+    <div class="product-container">
+
+        @foreach (Pedido pedido in Model)
+        {
+            <div class="product-card">
+                <h3>Número de identificação: @pedido.Id</h3>
+                <p>Estado do pedido: @pedido.Status</p>
+                <p>Estado de pagamento: @(pedido.Pago ? "Pago" : "Não pago")</p>
+
+
+                <div>
+                    <a asp-controller="PedidoMVC" asp-action="Details" asp-route-id="@pedido.Id" class="btn btn-primary">Ver Detalhes</a>
+                </div>
+                @if (ViewBag.UserCookieExists == "Administrador")
+                {
+                    <div>
+                        <form asp-controller="PedidoMVC" asp-action="AlterarEstadoPagamento" method="post" id="form_@pedido.Id">
+                            <input type="hidden" name="pedidoId" value="@pedido.Id" />
+                            <input type="hidden" name="NovoEstadoPagamento" id="NovoEstado_@pedido.Id" value="" />
+
+
+                            <button type="button" class="btn btn-success" onclick="alterarEstado('@pedido.Id', '@pedido.Pago')">
+                                <span id="btnText_@pedido.Id">@((pedido.Pago == false) ? "Marcar como pago" : "Marcar como não pago")</span>
+                            </button>
+
+                        </form>
+                    </div>
+                }
+
+                @if (ViewBag.UserCookieExists == "Administrador")
+                {
+                    <div>
+                        <form asp-controller="PedidoMVC" asp-action="AlterarEstado" method="post">
+                            <input type="hidden" name="pedidoId" value="@pedido.Id" />
+                            <select name="NovoEstado" class="form-control" onchange="habilitarBotao(this)">
+                                <option value="" selected disabled hidden>Altere o estado do pedido</option>
+                                @if (!pedido.Pago)
+                                {
+                                    <option value="Pendente">Pendente</option>
+                                    <option value="Cancelado">Cancelado</option>
+                                }
+                                else
+                                {
+                                    <option value="Preparar">A preparar</option>
+                                    <option value="Pronto">Pronto</option>
+                                    <option value="Entregue">Entregue</option>
+                                }
+                            </select>
+
+                            <button type="submit" class="btn btn-success" disabled>Alterar</button>
+                        </form>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+}
+
+@if (ViewBag.UserCookieExists == "Cliente")
+{
+    <div class="product-container">
+
+        @foreach (Pedido pedido in Model)
+        {
+@*             @if (ViewBag.User.Id == pedido.ContaUtilizador.Id)
+            { *@
+                <div class="product-card">
+                    <h3>Número de identificação: @pedido.Id</h3>
+                <p>Estado do pedido: @pedido.Status</p>
+                <p>Estado de pagamento: @(pedido.Pago ? "Pago" : "Não pago")</p>
+
+
+                <div>
+                    <a asp-controller="PedidoMVC" asp-action="Details" asp-route-id="@pedido.Id" class="btn btn-primary">Ver Detalhes</a>
+                </div>
+                
+                </div>
+            @* } *@
+        }
+    </div>
+}
+
+<script>
+    function habilitarBotao(selectElement) {
+        var alterarButton = selectElement.parentNode.querySelector('button[type="submit"]');
+        if (selectElement.value !== "") {
+            alterarButton.removeAttribute('disabled');
+        } else {
+            alterarButton.setAttribute('disabled', 'disabled');
+        }
+    }
+
+    function alterarEstado(pedidoId, Pago) {
+        var novoEstadoPagamento = (Pago === 'True') ? 'False' : 'True';
+        document.getElementById('NovoEstado_' + pedidoId).value = novoEstadoPagamento;
+        document.getElementById('btnText_' + pedidoId).innerText = 'Marcar como ' + ((novoEstadoPagamento === 'True') ? 'não pago' : 'pago');
+
+        // Submeta o formulário
+        document.getElementById('form_' + pedidoId).submit();
+    }
+</script>

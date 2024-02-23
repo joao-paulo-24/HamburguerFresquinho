@@ -1,0 +1,130 @@
+﻿@model Item
+@using WebAPI.Enums;
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0; 
+        padding: 0; 
+        text-align: center; 
+    }
+    .footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        height: 60px; 
+        line-height: 60px; 
+        display: flex;
+        justify-content: center;
+        align-content: end;
+    }
+
+    h2 {
+        color: #8B4513;
+        font-weight: bold;
+    }
+
+    form {
+        background-color: #fcece1; 
+        border: none;
+    }
+</style>
+<body>
+    <form method="post" enctype="multipart/form-data">
+    <div class="border m-2 p-4">
+        <div class="row pb-2">
+            <h2 class="text-primary">Create Item</h2>
+        </div>
+        <div asp-validation-summary="All"> </div>
+            <input asp-for="Id" hidden />
+
+        <div class="mb-3">
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label"></label>
+                    <input asp-for="Name" class="form-control" required />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Preco" class="form-label"></label>
+                    <input asp-for="Preco" class="form-control" required />
+                <span asp-validation-for="Preco" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Image" class="form-label"></label>
+                <input asp-for="Image" type="file" class="form-control" required/>
+                <span asp-validation-for="Image" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                @Html.DropDownListFor(m => m.TypeComida,
+                new SelectList(Enum.GetValues(typeof(EnumTypeComida))),
+                new { @class = "form-input" })
+            </div>
+            <label>Ingredientes de hamburguer</label>
+            <div>
+                @{
+
+                }
+
+
+                @foreach (var ingrediente in ViewBag.Item.Ingredientes)
+                {
+                    @if (ingrediente.TypeComida == (EnumTypeComida)0){
+                    <div class="form-check">
+                            <input type="checkbox" id="Check_@ingrediente.Id" name="ingredientesSelecionados" value="@ingrediente.Id" />
+                            <label for="Check_@ingrediente.Id">@ingrediente.Name</label>
+                    </div>
+                        }
+                }
+            </div>
+                <label>Ingredientes de bebida</label>
+                <div>
+                    @{
+
+                    }
+
+                    @foreach (var ingrediente in ViewBag.Item.Ingredientes)
+                    {
+                        @if (ingrediente.TypeComida == (EnumTypeComida)1)
+                        {
+                            <div class="form-check">
+                                <input type="checkbox" id="Check_@ingrediente.Id" name="ingredientesSelecionados" value="@ingrediente.Id" />
+                                <label for="Check_@ingrediente.Id">@ingrediente.Name</label>
+                            </div>
+                        }
+                    }
+                </div>
+                <label>Ingredientes de batata</label>
+                <div>
+                    @{
+
+                    }
+
+                    @foreach (var ingrediente in ViewBag.Item.Ingredientes)
+                    {
+                        @if (ingrediente.TypeComida == (EnumTypeComida)2)
+                        {
+                            <div class="form-check">
+                                <input type="checkbox" id="Check_@ingrediente.Id" name="ingredientesSelecionados" value="@ingrediente.Id" />
+                                <label for="Check_@ingrediente.Id">@ingrediente.Name</label>
+                            </div>
+                        }
+                    }
+                </div>
+        </div>
+            <button type="submit" class="btn btn-primary" style="border-color:transparent">Create</button>
+            <a asp-controller="ItemsMVC" asp-action="Index" class="btn btn-secondary" style="color:#8b4513">Back</a>
+    </div>
+</form>
+</body>
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

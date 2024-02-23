@@ -1,0 +1,95 @@
+﻿@using WebAPI.Enums
+@using WebAPI.Identity
+@model Ingrediente
+
+@{
+    ViewData["Title"] = "Create";
+}
+<style>
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0; 
+        padding: 0;
+        text-align: center; 
+    }
+
+    .footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        height: 60px; 
+        line-height: 60px; 
+        display: flex;
+        justify-content: center;
+        align-content: end;
+    }
+
+    h1 {
+        color: #8B4513;
+        font-weight: bold;
+    }
+
+    form {
+        background-color: #fcece1;
+        border: none;
+    }
+</style>
+<body>
+    <Authorize(Policy ="IdentityData.AdminUserPolicyName" )>
+    <div class="form-container">
+        <h1 class="form-title">Create Ingredient</h1>
+        <form method="post" enctype="multipart/form-data">
+            <div class="mb-3">
+                <input asp-for="Id" hidden />
+
+                <label asp-for="Name" class="form-label"></label>
+                    <input asp-for="Name" class="form-control" required />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Price" class="form-label"></label>
+                    <input asp-for="Price" class="form-control" required />
+                <span asp-validation-for="Price" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Stock" class="form-label"></label>
+                    <input asp-for="Stock" class="form-control" required />
+                <span asp-validation-for="Stock" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Image" class="form-label"></label>
+                    <input asp-for="Image" id="imageInput" type="file" class="form-control" required />
+                <span asp-validation-for="Image" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                @Html.DropDownListFor(m => m.TypeComida,
+                new SelectList(Enum.GetValues(typeof(EnumTypeComida))),
+                new { @class = "form-input" })
+            </div>
+            <div class="flex justify-between">
+                <button type="submit" class="btn btn-primary" style="border-color:transparent">Create</button>
+                <a asp-controller="StockMVC" asp-action="Index" class="btn btn-secondary" style="color:#8b4513">Back</a>
+            </div>
+        </form>
+    </div>
+</body>
+
+<script>
+    document.querySelector('form').addEventListener('submit', function (event) {
+        var imageInput = document.getElementById('imageInput');
+        if (imageInput.files.length === 0) {
+            event.preventDefault(); // Evita o envio do formulário se não houver imagem selecionada
+            var errorSpan = document.querySelector('span[data-valmsg-for="Image"]');
+            errorSpan.textContent = "Please select an image."; // Mostra uma mensagem de erro
+        }
+    });
+</script>
+
+
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

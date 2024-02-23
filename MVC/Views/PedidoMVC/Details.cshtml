@@ -1,0 +1,96 @@
+﻿@model WebAPI.Models.Pedido
+@using ProjetoLDS.Models
+@{
+	ViewData["Title"] = "Details";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+	body {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		margin: 0;
+		padding: 0;
+		text-align: center;
+	}
+
+	.footer {
+		position: fixed;
+		bottom: 0;
+		width: 100%;
+		height: 60px;
+		line-height: 60px;
+		display: flex;
+		justify-content: center;
+		align-content: end;
+	}
+
+	h1 {
+		color: #8B4513;
+		font-weight: bold;
+	}
+
+	form {
+		background-color: #fcece1;
+		border: none;
+	}
+
+	.tbody tr:first-child {
+		background-color: #ffad73;
+	}
+
+	.tbody tr:not(:first-child) {
+		background-color: #ffd5b8;
+	}
+</style>
+
+<h1>Detalhes do pedido</h1>
+<body>
+	<h2>Itens do Pedido</h2>
+	<table class="table">
+		<thead>
+			<tr>
+				<th>ID do Item Pedido</th>
+				<th>Nome do Produto</th>
+				<th>Preço</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var itemPedido in ViewBag.Pedido.ItensPedido)
+			{
+				<tr>
+					<td>@itemPedido.Id</td>
+					<td>
+
+						@itemPedido.ItemCompra.Name
+
+					</td>
+					<td>
+
+						@(itemPedido.Preco / 100M)€
+
+					</td>
+				</tr>
+
+				@foreach (var editIngrediente in itemPedido.EditIngredientes)
+				{
+					<tr>
+						<td><strong>Ingrediente Editado</strong></td>
+						<td>@editIngrediente.Item.Name</td>
+						<td>0.00€</td>
+						<td>@editIngrediente.Ingrediente.Name</td>
+						@if (editIngrediente.Active)
+						{
+							<td>Adicionar</td>
+						}
+						else
+						{
+							<td>Remover</td>
+						}
+					</tr>
+				}
+			}
+		</tbody>
+	</table>
+	<a asp-controller="PedidoMVC" asp-action="Index" class="btn btn-secondary" style="color:#8b4513">Back</a>
+</body>

@@ -1,0 +1,86 @@
+﻿@model List<Item>
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        height: 60px; 
+        line-height: 60px;
+        / Use o mesmo valor de altura para o line-height para centralizar verticalmente o texto / display: flex;
+        justify-content: center;
+        align-content: end;
+        padding-left: 550px;
+    }
+
+    h1 {
+        color: #8B4513;
+        font-weight: bold;
+    }
+
+    .product-container {
+        display: flex;
+        flex-wrap: wrap; 
+        gap: 29px;
+    }
+
+    .product-card {
+        flex: 0 0 calc(33.33% - 20px); 
+        box-sizing: border-box; 
+        border: 1px solid #ddd;
+        padding: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px; 
+    }
+
+
+        .product-card img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .product-card h3 {
+            margin-top: 10px;
+            color: #333;
+        }
+
+        .product-card p {
+            color: #888;
+        }
+</style>
+
+<h1>Items</h1>
+
+@if (ViewBag.UserCookieExists == "Administrador")
+{
+    <div>
+        <a asp-controller="ItemsMVC" asp-action="Create" class="btn btn-primary">
+            Create New Item
+        </a>
+    </div>
+}
+
+<div class="product-container">
+    @foreach (Item item in Model)
+    {
+        <div class="product-card">
+            <!-- Adicione a imagem do item aqui -->
+            <img src="~/Images/ItemImages/@item.ImagePath" alt="Imagem do Item" style="width: 200px; height: 200px; object-fit: cover; display: block; margin: 0 auto;">
+
+            <h3>@item.Name</h3>
+            <p>@(item.Preco / 100M)€</p>
+
+            @if (ViewBag.UserCookieExists == "Administrador")
+            {
+                <div>
+                    <a asp-controller="ItemsMVC" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                    <a asp-controller="ItemsMVC" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </div>
+            }
+        </div>
+    }
+</div>

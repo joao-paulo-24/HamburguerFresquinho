@@ -1,0 +1,101 @@
+﻿@model Item
+@using WebAPI.Enums;
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0; 
+        padding: 0;
+        text-align: center; 
+    }
+    .footer {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        height: 60px;
+        line-height: 60px; 
+        display: flex;
+        justify-content: center;
+        align-content: end;
+    }
+
+    h1 {
+        color: #8B4513;
+        font-weight: bold;
+    }
+
+    form {
+        background-color: #fcece1; 
+        border: none;
+    }
+</style>
+
+
+<h1>Edit Item</h1>
+<body>
+    <form method="post" asp-controller="ItemsMVC" asp-action="Edit" enctype="multipart/form-data">
+    <div class="border m-2 p-4">
+        <div asp-validation-summary="All"></div>
+        <div class="mb-3">
+                <input asp-for="Id" hidden />
+                <input asp-for="ImagePath" hidden />
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label"></label>
+                <input asp-for="Name" class="form-control" required/>
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Preco" class="form-label"></label>
+                <input asp-for="Preco" class="form-control" required/>
+                <span asp-validation-for="Preco" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Image" class="form-label"></label>
+                <input asp-for="Image" type="file" class="form-control" />
+                <span asp-validation-for="Image" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                @Html.DropDownListFor(m => m.TypeComida,
+                new SelectList(Enum.GetValues(typeof(EnumTypeComida))))
+            </div>
+            <label>Ingredientes</label>
+            <div>
+                @{
+
+                }
+                @foreach (var ingrediente in ViewBag.Item.Ingredientes)
+                {
+                        @if (@ingrediente.TypeComida == Model.TypeComida){
+                            bool isChecked = false;
+                            foreach (var ingredienteAtribuido in ViewBag.IngredientesAtribuido)
+                            {
+                                if (ingredienteAtribuido.IdIngrediente == ingrediente.Id)
+                                {
+                                    isChecked = true;
+                                    break;
+                                }
+                            }
+                            <div class="form-check">
+                                <input type="checkbox" id="Check_@ingrediente.Id" name="ingredientesSelecionados" value="@ingrediente.Id" checked="@isChecked"/>
+                                <label for="Check_@ingrediente.Id">@ingrediente.Name</label>
+                            </div>
+                        }
+                    }
+            </div>
+                <button type="submit" class="btn btn-primary" style="border-color:transparent">Update</button>
+                <a asp-controller="ItemsMVC" asp-action="Index" class="btn btn-secondary" style="color:#8b4513">Back</a>
+        </div>
+    </form>
+</body>
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

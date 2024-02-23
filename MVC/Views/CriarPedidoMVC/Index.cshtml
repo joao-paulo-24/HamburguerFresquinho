@@ -1,0 +1,423 @@
+﻿@model CriarPedidoViewModel
+@{
+	ViewData["Title"] = "Index";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+	.footer {
+		position: fixed;
+		bottom: 0;
+		width: 100%;
+		height: 60px;
+		line-height: 60px;
+		/ Use o mesmo valor de altura para o line-height para centralizar verticalmente o texto / display: flex;
+		justify-content: center;
+		align-content: end;
+		padding-left: 550px;
+	}
+
+	h1 {
+		color: #8B4513;
+		font-weight: bold;
+	}
+
+	.product-container {
+		display: flex;
+		flex-wrap: wrap; 
+		gap: 29px;
+	}
+
+	.product-card {
+		flex: 0 0 calc(33.33% - 20px); 
+		box-sizing: border-box;
+		border: 1px solid #ddd;
+		padding: 15px;
+		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+		margin-bottom: 20px; 
+	}
+
+
+		.product-card img {
+			max-width: 100%;
+			height: auto;
+		}
+
+		.product-card h3 {
+			margin-top: 10px;
+			color: #333;
+		}
+
+		.product-card p {
+			color: #888;
+		}
+</style>
+
+<h1>Criar Pedido</h1>
+
+<h3>Pontos Utilizador: @ViewBag.User.Pontos</h3>
+
+<div class="product-container">
+
+	@foreach (ItemCompra itemCompra in Model.ItemParaCompra)
+	{
+		if (itemCompra.CheckHaveStock())
+		{
+			<div class="product-card" data-item-id="@itemCompra.Id" style="cursor: pointer;" onclick="adicionarItemCompra(@itemCompra.Id)" )>
+				<img src="~/Images/ItemImages/@itemCompra.ImagePath" alt="Imagem do Ingrediente" style="width: 200px; height: 200px; object-fit: cover; display: block; margin: 0 auto;">
+
+				<h3>@itemCompra.Name</h3>
+				<p>@(itemCompra.Preco / 100M)€</p>
+			</div>
+		}
+		else
+		{
+			<div class="product-card unavailable" data-item-id="@itemCompra.Id">
+				<img src="~/Images/ItemImages/@itemCompra.ImagePath" alt="Imagem do Ingrediente" style="width: 200px; height: 200px; object-fit: cover; display: block; margin: 0 auto;">
+
+				<h3>@itemCompra.Name</h3>
+				<p>@(itemCompra.Preco / 100M)€</p>
+				<h3>Indisponível</h3>
+			</div>
+		}
+	}
+</div>
+
+
+<div class="infoPedido-container">
+
+	@{
+		int precoCarrinho = Model.ObterPrecoCarrinho();
+		decimal precoCarrinhoEmEuros = (decimal)precoCarrinho / 100M;
+	}
+
+	<h3>Pedido</h3>
+	<h4 id="numeroItems">Numero de Items: 0 </h4>
+	<h4 id="precoTotal">Preço Total: 0.00€</h4>
+	<h4 id="pontosTotal">Pontos Total: 0</h4>
+
+	<div>
+		@* <a asp-controller="CriarPedidoMVC" asp-action="EditarPedido" asp-route-id="">Editar Pedido</a> *@
+		<div>
+			<form asp-action="Confirmar" asp-controller="CriarPedidoMVC">
+				<input type="hidden" name="Pedido" id="pedidoJsonInput" />
+				<input type="submit" value="Confirmar" />
+			</form>
+		</div>
+	</div>
+</div>
+
+<div id="confirmarPopup" class="modal fade" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3 class="modal-title">Confirmar Adição</h3>
+			</div>
+			<div class="modal-body">
+
+				<img id="imagemPopUp" src="" alt="Imagem do Ingrediente" style="width: 200px; height: 200px; object-fit: cover; display: block; margin: 0 auto;">
+				<h4 id="nomePopUp"></h4>
+
+				<p>Tem certeza de que deseja adicionar este item ao carrinho?</p>
+
+
+				<button id="editOption" type="button" class="btn btn-primary" onclick="editar()">Editar Item</button>
+
+				<div id="usarPontosCheckboxDiv" class="form-check">
+					<input type="checkbox" class="form-check-input" id="usarPontosCheckbox">
+					<label class="form-check-label" for="usarPontosCheckbox">Usar Pontos</label>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" onclick="cancelar()" data-dismiss="modal">Cancelar</button>
+				<button type="button" class="btn btn-primary" onclick="confirmarAdicao()">Confirmar</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div id="editarPopup" class="modal fade" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="edit-title">Editar</h4>
+			</div>
+			<div class="edit-body">
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" onclick="cancelarEdit()" data-dismiss="modal">Voltar</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div id="editarItemPopup" class="modal fade" role="dialog">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 id="editItem-title" class="editItem-title">Editar</h4>
+			</div>
+			<div class="editItem-body">
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" onclick="cancelarEditItem()" data-dismiss="modal">Cancelar</button>
+				<button type="button" class="btn btn-primary" onclick="confirmEditItem()">Confirmar</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+	var pontos = @ViewBag.User.Pontos;
+
+	var itemCompra;
+
+	var editIngredientesJson = []
+
+	var isMenu;
+
+	var itemEditarId;
+
+	var precoTotal = 0;
+
+	var pontosTotal = 0;
+
+	var pedidoJson = {
+		itensPedido: [],
+		contaUtilizador: {
+			id: @ViewBag.User.Id,
+			email: "@ViewBag.User.Email",
+			password: "@ViewBag.User.Password"
+		}
+	};
+
+
+	function adicionarItemCompra(idItemCompra) {
+		editIngredientesJson = [];
+
+		$.ajax({
+			url: '/api/ItemCompra/' + idItemCompra,
+			type: 'GET',
+			success: function (data) {
+				itemCompra = data;
+				console.log(data);
+
+				$('#nomePopUp').text('Adicionar: ' + data.name);
+
+				// Atualiza o caminho da imagem diretamente
+				var imagePath = '/Images/ItemImages/' + data.imagePath;
+				$('#confirmarPopup #imagemPopUp').attr('src', imagePath);
+
+				if (data.pontosNecessarios != -1 && pontos > data.pontosNecessarios) {
+					// Se os pontos necessários não forem nulos e não forem -1, exibir a checkbox
+					$('#usarPontosCheckboxDiv').show();
+				} else {
+					// Se forem nulos ou -1, esconder a checkbox
+					$('#usarPontosCheckboxDiv').hide();
+				}
+
+				if (data.pontosNecessarios != -1 && pontos > data.pontosNecessarios) {
+					// Se os pontos necessários não forem nulos e não forem -1, exibir a checkbox
+					$('#usarPontosCheckboxDiv').show();
+				} else {
+					// Se forem nulos ou -1, esconder a checkbox
+					$('#usarPontosCheckboxDiv').hide();
+				}
+
+				isMenu = itemCompra.items && Array.isArray(itemCompra.items);
+
+				var botao = document.getElementById("editOption");
+
+				if (isMenu) {
+					botao.style.display = "none";
+				}
+				else {
+					botao.style.display = "block";
+				}
+
+
+				// Abre o popup de confirmação
+				$('#confirmarPopup').modal('show');
+
+				window.itemIdToAdd = data.id;
+			},
+			error: function (error) {
+				// Trate o erro conforme necessário
+			}
+		});
+	}
+
+	function confirmarAdicao() {
+
+		let itemPedido = {
+			itemCompra: {
+				id: itemCompra.id
+			},
+			editIngredientes: editIngredientesJson,
+			usePoints: $('#usarPontosCheckbox').is(':checked')
+		}
+
+
+		if (itemPedido.usePoints) {
+			pontosTotal += itemCompra.pontosNecessarios;
+			$('#pontosTotal').text('Pontos Total: ' + pontosTotal);
+		}
+		else {
+			precoTotal += itemCompra.preco;
+			var precoEuros = precoTotal / 100;
+			$('#precoTotal').text('Preço Total: ' + precoEuros + '€');
+		}
+
+		pedidoJson.itensPedido.push(itemPedido);
+
+		$('#numeroItems').text('Numero De Items: ' + pedidoJson.itensPedido.length);
+
+		$('#confirmarPopup').modal('hide');
+
+		document.getElementById("pedidoJsonInput").value = JSON.stringify(pedidoJson);
+	}
+
+	function cancelar() {
+
+		$('#confirmarPopup').modal('hide');
+	}
+
+	function editar() {
+
+		var editBodyElement = $('#editarPopup').find('.edit-body');
+
+		$('#edit-title').text('Editar: ' + itemCompra.name);
+
+		if (isMenu) {
+			// Se a propriedade 'items' existir e for um array, considera-se como um Menu
+			editBodyElement.html('<h4>Menu: ' + itemCompra.name + '</h4>');
+
+			itemCompra.items.forEach(function (items) {
+
+				editBodyElement.append('<h5>' + items.name + '</h5>');
+				editBodyElement.append('<button type="button" class="btn btn-primary" onclick="editarItem(' + items.id + ')" data-dismiss="modal">Editar</button>');
+
+				$('#editarPopup').modal('show');
+			});
+
+		} else {
+			editarItem(itemCompra.id);
+		}
+
+		$('#confirmarPopup').modal('hide');
+	}
+
+	function editarItem(itemId) {
+
+		var editBodyElement = $('#editarItemPopup').find('.editItem-body');
+		editBodyElement.empty();
+
+		$.ajax({
+			url: '/api/Items/' + itemId,
+			type: 'GET',
+			success: function (data) {
+
+				itemEditarId = itemId;
+				console.log(data.name);
+				$('#editItem-title').text('Editar: ' + data.name);
+
+				$.ajax({
+					url: '/CriarPedidoMVC/GetIngredientesItem?itemId=' + itemId,
+					type: 'GET',
+					success: function (data) {
+
+						data.forEach(function (ingrediente) {
+
+
+							if (ingrediente.price > 0) {
+								// Criar o botão e adicioná-lo ao elemento
+								var checkboxDiv = $('<div class="form-check">');
+								var checkboxInput = $('<input type="checkbox">').attr({
+									id: 'Check_' + ingrediente.id,
+									name: 'ingredientesSelecionados',
+									value: ingrediente.id,
+									checked: true,
+								});
+								var checkboxLabel = $('<label>').attr('for', 'Check_' + ingrediente.id).text(ingrediente.name);
+
+								checkboxDiv.append(checkboxInput);
+								checkboxDiv.append(checkboxLabel);
+
+								editBodyElement.append(checkboxDiv);
+
+							}
+						});
+					},
+					error: function (error) {
+						// Lógica de erro, se necessário
+					}
+				});
+
+			},
+			error: function (error) {
+				// Lógica de erro, se necessário
+			}
+		});
+
+
+		$('#editarPopup').modal('hide');
+		$('#editarItemPopup').modal('show');
+	}
+
+	function cancelarEdit() {
+
+		$('#editarPopup').modal('hide');
+		$('#confirmarPopup').modal('show');
+	}
+
+	function cancelarEditItem() {
+
+		$('#editarItemPopup').modal('hide');
+
+		if (isMenu) {
+			$('#editarPopup').modal('show');
+		}
+		else {
+			$('#confirmarPopup').modal('show');
+		}
+
+	}
+
+	function confirmEditItem() {
+
+		$('.editItem-body input[type="checkbox"]').each(function () {
+
+
+			var value = $(this).val(); // Obtém o valor do checkbox
+			var ativo = $(this).prop('checked'); // Verifica se o checkbox está marcado (ativo)
+
+			var editItemJson =
+			{
+				"item": {
+					"id": itemEditarId
+				},
+				"ingrediente": {
+					"id": value
+				},
+				"active": ativo
+			}
+
+			editIngredientesJson.push(editItemJson);
+		});
+
+
+		$('#editarItemPopup').modal('hide');
+
+		if (isMenu) {
+			$('#editarPopup').modal('show');
+		}
+		else {
+			$('#confirmarPopup').modal('show');
+		}
+
+
+
+	}
+
+</script>
